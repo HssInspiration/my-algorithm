@@ -10,9 +10,9 @@ import java.util.Scanner;
 public class Excel单元格数值统计 {
 
 
-    public static String[][] strings;
+    /*public static String[][] strings;
 
-    public static void main(String[] args) {
+    public static void main3(String[] args) {
 
         Scanner sc = new Scanner(System.in);
 
@@ -104,5 +104,85 @@ public class Excel单元格数值统计 {
         }
 
         return new int[]{Integer.valueOf(num) - 1, y};
+    }*/
+
+    private static String[][] excel;
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int row = sc.nextInt();
+        int col = sc.nextInt();
+        sc.nextLine();
+        excel = new String[row][col];
+        for (int i = 0; i < row; i++) {
+            excel[i] = sc.nextLine().split(" ");
+        }
+        String[] locations = sc.nextLine().split(":");
+        int[] startArray = location(locations[0]);
+        int[] endArray = location(locations[1]);
+        int sum = 0;
+        for (int i = startArray[0]; i <= endArray[0]; i++) {
+            for (int j = startArray[1]; j <= endArray[1]; j++) {
+                String temp = excel[i][j];
+                if (temp.contains("=")) {
+                    // 是公式进行计算
+                    sum += cal(temp);
+                } else {
+                    // 否则直接加
+                    sum += Integer.parseInt(temp);
+                }
+            }
+        }
+        System.out.println(sum);
+    }
+
+    private static int cal(String temp) {
+        temp = temp.replace("=", "");
+        int numFirst = 0, numSec = 0;
+        boolean plusFlag = true, isNum = true;
+        StringBuilder val = new StringBuilder();
+        for (int i = 0; i < temp.length(); i++) {
+            char c = temp.charAt(i);
+            if (c == '+' || c == '-') {
+                if (c == '-') {
+                    plusFlag = false;
+                }
+                numFirst = getNum(isNum, val.toString());
+                // 重置原有的值
+                val = new StringBuilder();
+                isNum = true;
+            } else {
+                if (!Character.isDigit(c)) {
+                    isNum = false;
+                }
+                val.append(c);
+            }
+            if (i == temp.length() - 1) {
+                numSec = getNum(isNum, val.toString());
+            }
+        }
+        return plusFlag ? numFirst + numSec : numFirst - numSec;
+    }
+
+    private static int getNum(boolean isNum, String val) {
+        if (isNum) {
+            return Integer.parseInt(val);
+        }
+        int result;
+        if (val.contains("=")) {
+            result = cal(val);
+        } else {
+            int[] intArr = location(val);
+            String actualVal = excel[intArr[0]][intArr[1]];
+            result = Integer.parseInt(actualVal);
+        }
+        return result;
+    }
+
+    private static int[] location(String location) {
+        // 获取列
+        int col = location.charAt(0) - 'A';
+        // 返回行与列
+        return new int[]{Integer.parseInt(location.substring(1)) - 1, col};
     }
 }
