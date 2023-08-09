@@ -18,9 +18,9 @@ public class 服务失效判断2 {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         String[] strings = sc.nextLine().split(",");
-        String[] guzhang = sc.nextLine().split(",");
+        String[] fault = sc.nextLine().split(",");
         List<String> setSer = new ArrayList<>();     //所有服务集合（取出错误服务）
-        errorSer = Arrays.asList(guzhang);
+        errorSer = Arrays.asList(fault);
         for (String string : strings) {
             String[] temp = string.split("-");
             list.add(temp);
@@ -36,7 +36,7 @@ public class 服务失效判断2 {
 
         List<String> listZC = new ArrayList<>();    //保持正常的服务
         setSer.forEach(v -> {
-            if (!isGz(v)) {      //如果非故障则取出
+            if (!checkFault(v)) {      //如果非故障则取出
                 listZC.add(v);
             }
         });
@@ -54,12 +54,21 @@ public class 服务失效判断2 {
             System.out.println(res);
         }
     }
-    public static boolean isGz(String s) {  //服务依赖关系集合，需要判断的服务，故障服务集合
-        if (errorSer.contains(s)) { //此时服务故障则返回true
+
+    /**
+     * 服务依赖关系集合，需要判断的服务，故障服务集合
+     *
+     * @param s s
+     * @return 是否存在故障
+     */
+    public static boolean checkFault(String s) {
+        // 此时服务故障则返回true
+        if (errorSer.contains(s)) {
             return true;
         }
         for (String[] strings : list) {
-            if (strings[0].equals(s) && isGz(strings[1])) {    //如果此时服务依赖另外一个服务，则对依赖的服务进行一次故障判断，如为故障则返回true
+            // 如果此时服务依赖另外一个服务，则对依赖的服务进行一次故障判断，如为故障则返回true
+            if (strings[0].equals(s) && checkFault(strings[1])) {
                 return true;
             }
         }
