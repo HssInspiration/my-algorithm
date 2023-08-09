@@ -20,7 +20,7 @@ public class 组成最大数 {
                 if (first < second) {
                     String temp = strArr[i];
                     strArr[i] = strArr[j];
-                    strArr[j] = temp;
+                    strArr[j] = temp;   
                 }
             }
         }
